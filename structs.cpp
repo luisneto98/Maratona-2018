@@ -17,47 +17,36 @@ typedef vector<ii> vii;
 
 /*---------- GRAPH ---------- */
 
-typedef struct {
-   int V, E;
-   vector<vii> adj_list;
-   /* Lista de adjacencia:
-    * É um vector <vector < pair<int,int> > >
-    * Cada no é um vector<pair<int,int>>
-    * cada pair<int, int>,o first é o numero do no, o segundo é o peso
-    */
-} Graph;
+int V, E;
+vector<vii> adj_list;
+vector<bool> visited;
 
-void printGraph(Graph *g) {
-  foreach(it, g->adj_list) {
-     cout << "No: " << (it - g->adj_list.begin()) << endl;
+void printGraph() {
+  foreach(it, adj_list) {
+     cout << "No: " << (it - adj_list.begin()) << endl;
      foreach(it2, *it) {
         printf("   Vizinho: %d, Peso: %d\n", it2->first, it2->second);
      }
   }
 }
 
-void initGraph(Graph *g, int n) {
-   g->V = n;
-   g->E = 0;
-   g->adj_list.assign(n, vii());
+void addEdge(int v, int u, int w) {
+   adj_list[v].push_back(make_pair(u, w));
+   E++;
 }
 
-void addEdge(Graph *g, int v, int u, int w) {
-   g->adj_list[v].push_back(make_pair(u, w));
-   g->E++;
-}
-
-void bfs(Graph *g, int node) {
-   vi visited(g->V, 0);
+void bfs(int node) {
+   visited.fill(false);
    queue<int> fila;
 
    fila.push(node);
    visited[node] = 1;
    while(!fila.empty()) {
-      int v = fila.front();
-      fila.pop();
+      int v = fila.front(); fila.pop();
+#ifdef _DEBUG_
       printf("No: %d\n", v);
-      foreach(it, g->adj_list[v]) { // Percorrer vizinhos do no
+#endif
+      foreach(it, adj_list[v]) { // Percorrer vizinhos do no
          if(!visited[it->first]) { // Se vizinho ainda n foi visitado
             visited[it->first] = 1;
             fila.push(it->first);
@@ -66,22 +55,80 @@ void bfs(Graph *g, int node) {
    }
 }
 
-void dfs_visit(Graph *g, vi *visited, int node) {
-   visited->at(node) = 1;
+void dfs_visit(int node) {
+   visited[node] = true;
+#ifdef _DEBUG_
    printf("No: %d\n", node);
-   foreach(it, g->adj_list[node]) {
-      if(!visited->at(it->first))
-         dfs_visit(g, visited, it->first);
+#endif
+   foreach(it, adj_list[node]) {
+      if(!visited[(it->first)])
+         dfs_visit(it->first);
    }
 }
-
-void dfs(Graph *g, int node) {
-   vi visited(g->V, 0);
-   dfs_visit(g, &visited, node);
+void dfs(int node) {
+   visited.fill(false);
+   dfs_visit(node);
 }
 
-void dijkstra(Graph *g, int node, vi *cost) {
-   vi visited(g->V, 0);
+/* Acha o numero de nos conectados */
+void find_con_nodes() {
+   visited.fill(false);
+   fori(i, V)
+      if (!visited[i])
+         printf("CC %d:", ++numCC), dfs(i), printf("\n");
+}
+
+int dr[] = {1, 1, 0, -1, -1, -1, 0, 1};
+int dc[] = {0, 1, 1, 1, 0, -1, -1, -1};
+/* rows, cols, replace c1 with c2;
+ * retorna o numero de c1s */
+int floodfill(int r, int c, char c1, char c2) {
+   if (r < 0 || r >= R || c < 0 || c >= C) return 0;
+   if (grid[r][c] != c1) return 0;
+   int ans = 1;
+   grid[r][c] = c2;
+   fori(d, 8)
+      ans += floodfill(r+dr[d], c+dc[d], c1, c2);
+   return ans;
+}
+
+vi ts; // Guarda topsort na ordem reversa
+void top_sort(int u) {
+   visited[u] = true;
+   fori(i, adj_list.size(); i++) {
+      ii v = adj_list[u][j];
+      if(!visited[v.first])
+         top_sort(v.first);
+   }
+   ts.push_back(u);
+}
+
+bool Bipartite() {
+   queue<int> q; q.push(s);
+   vi color(V, INF);
+   color[s] = 0;
+   bool isBi = true;
+   while(!q.empty() & is Bi) {
+      int u = q.front(); q.pop();
+      fori(i, adj_list[u].size()) {
+         ii v = adj_list[u][i];
+         if(color[v.first] == INF) {
+            color[v.first] = 1- color[u];
+            q.push(v.first);
+         }else if (color[v.first] == color[u]) {
+            isBi = false;
+            break;
+         }
+      }
+   }
+   return isBi;
+}
+
+void articulationPointAndBridge(int u) {
+}
+
+void dijkstra(int node, vi *cost) {
+   visited.fill(false);
    cost->at(node) = 0;
    priority_queue<ii, vector<ii>, greater<ii> > q;
    q.push(make_pair(0, node));
@@ -93,7 +140,7 @@ void dijkstra(Graph *g, int node, vi *cost) {
       if (visited[u]) continue;
 
       visited[u] = 1;
-      foreach(it, g->adj_list[u]) {
+      foreach(it, adj_list[u]) {
          int v = it->first;
          int weight = it->second;
          if(cost->at(u) + weight < cost->at(v)) {
@@ -104,10 +151,12 @@ void dijkstra(Graph *g, int node, vi *cost) {
    }
 }
 
-void prim(Graph *g, Graph *result) {
+
+
+void prim(Graph *result) {
 }
 
-void kruskal(Graph *g, Graph *result) {
+void kruskal(Graph *result) {
 }
 
 /*---------- Union Find Disjoint Set ----------*/
