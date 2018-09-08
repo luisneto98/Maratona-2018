@@ -1,0 +1,137 @@
+\documentclass{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage{listings}
+\usepackage[a4paper, total={6in, 8in}]{geometry}
+
+\title{Resumo STL}
+
+\begin{document}
+\maketitle
+
+\section{Containers Importantes}
+Os mais usados são \textbf{vector}, \textbf{pair}, \textbf{map}, \textbf{set}.
+
+\subsection{Vector}
+Refinamento das classes Random Access Sequence e Back Insertion Sequence, se
+comporta como um array.\\
+Definido em \textbf{<vector>}.\\
+
+Funções definidas:
+\begin{itemize}
+   \item empty, size, clear push\_back, pop\_back, insert, erase, begin, end
+\end{itemize}
+
+\begin{lstlisting}
+vector<int>::iterator cur = vet.begin() \\Usando iterator
+vector<int>::iterator end = vet.end() \\Usando iterator
+while (; cur != end, ++cur)
+   cout << *cur << endl;
+\end{lstlisting}
+
+\subsection{Bitset}
+
+\subsection{Linked List}
+
+\subsection{Stack}
+
+\subsection{Queue and Double Queue}
+
+\subsection{Pair}
+Pair é uma struct, e não uma classe.\\
+Pra fazer um pair:
+\begin{lstlisting}
+make_pair(first, second)
+\end{lstlisting}
+
+\subsection{Balanced Search Tree (Map/Set)}
+Tabela de símbolos genérica, com chave e valor.\\
+Definido em \textbf{<map>}.\\
+É possível iterar sobre o mapa, usando begin() e end().
+
+Funções definidas:
+
+\begin{itemize}
+   \item insert(pair<key, value>):pair<iterator, bool>, find(key):iterator, begin():iterator, end():iterator
+\end{itemize}
+
+\begin{lstlisting}
+map<string, vector<int> > teste;
+vector<int> numeros(10, 0);
+
+pair<map<string, vector<int> >::iterator, bool> resultado ;
+resultado = ex.insert(make_pair("lucas", numeros));
+\end{lstlisting}
+
+\subsection{Heap (priority\_queue)}
+
+\subsection{Hash Table (Unordered\_map)}
+
+\subsection{Graph}
+
+\section{Algoritmos Importantes}
+\begin{itemize}
+   \item find(first, last, value):
+   \item copy(first, last, result):
+   \item swap(a, b):
+   \item remove(first, last, value):
+   \item unique(first, last [,pred]):
+   \item reverse(first, last):
+   \item sort(first, last [, comp]):
+   \item stable\_sort(first, last [,comp]):
+   \item merge(first1, last1, first2, last2, result [,comp]):
+   \item inplace\_merge():
+   \item includes():
+   \item set\_union():
+   \item is\_sorted():
+   \item min(), max():
+   \item iota():
+   \item binary\_search();
+   \item next\_permutation();
+      \begin{lstlisting}
+      \end{lstlisting}
+   \item min\_element():
+   \item max\_element():
+\end{itemize}
+
+\section{Misc}
+
+\begin{lstlisting}
+#define _foreach(it, b, e) for (typeof(b) it = (b); it != (e); it++) 
+#define foreach(x...) _foreach(x)
+#define all(x) (x).begin(), (x).end()
+#define UNIQUE(c) c.resize(unique(all(c)) - (c).begin())
+
+#define INF 1000000000
+
+typedef long long     ll
+typedef pair<int,int> ii
+typedef pair<int,ii>  iii
+typedef vector<int>   vi
+typedef vector<ii>    vii
+
+//memset(arr, 0, sizeof arr); // Clear array
+
+// Imprimir N casas de Pi
+double pi = 2 * acos(0,0);
+cin << n << pi;
+printf("%. *lf\n", n, pi);
+
+// Imprimir numeros distintos ordenados
+sort(ALL(v)); UNIQUE(v);
+
+// Gen todos os subsets
+int p[20], N = 2
+for(i = 0; i < 20; i++) p[i] = i
+for(i = 0; i < (i << N); i++)
+   for(j = 0; j < N; j++)
+      if (i & (i << j))
+         printf("%d ", p[j])
+   printf("\n")
+
+
+\end{lstlisting}
+
+\end{document}
