@@ -95,7 +95,7 @@ int floodfill(int r, int c, char c1, char c2) {
 vi ts; // Guarda topsort na ordem reversa
 void top_sort(int u) {
    visited[u] = true;
-   fori(i, adj_list.size(); i++) {
+   fori(j, adj_list.size()) {
       ii v = adj_list[u][j];
       if(!visited[v.first])
          top_sort(v.first);
