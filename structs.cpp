@@ -17,17 +17,20 @@ typedef vector<ii> vii;
 
 /*---------- GRAPH ---------- */
 
-int V, E;
+int V, E, weight, a, b;
+int adj_mat[100][100];
 vector<vii> adj_list;
+priority_queue<pair<int, ii> > edge_list;
+
 vector<bool> visited;
 
 void printGraph() {
-  foreach(it, adj_list) {
-     cout << "No: " << (it - adj_list.begin()) << endl;
-     foreach(it2, *it) {
-        printf("   Vizinho: %d, Peso: %d\n", it2->first, it2->second);
-     }
-  }
+   foreach(it, adj_list) {
+      cout << "No: " << (it - adj_list.begin()) << endl;
+      foreach(it2, *it) {
+         printf("   Vizinho: %d, Peso: %d\n", it2->first, it2->second);
+      }
+   }
 }
 
 void addEdge(int v, int u, int w) {
@@ -35,169 +38,280 @@ void addEdge(int v, int u, int w) {
    E++;
 }
 
-void bfs(int node) {
-   visited.fill(false);
-   queue<int> fila;
-
-   fila.push(node);
-   visited[node] = 1;
-   while(!fila.empty()) {
-      int v = fila.front(); fila.pop();
-#ifdef _DEBUG_
-      printf("No: %d\n", v);
-#endif
-      foreach(it, adj_list[v]) { // Percorrer vizinhos do no
-         if(!visited[it->first]) { // Se vizinho ainda n foi visitado
-            visited[it->first] = 1;
-            fila.push(it->first);
-         }
-      }
-   }
-}
-
-void dfs_visit(int node) {
-   visited[node] = true;
-#ifdef _DEBUG_
-   printf("No: %d\n", node);
-#endif
-   foreach(it, adj_list[node]) {
-      if(!visited[(it->first)])
-         dfs_visit(it->first);
-   }
-}
+#define DFS_WHITE -1
+#define DFS_BLACK 1 // Visited
+vi dfs_num;
+int numCC;
+/* numCC = 0;
+ * dfs_num.assign(V, DFS_WHITE)
+ * fori(i, V)
+ *    if(dfs_num[i] == WHITE)
+ *       printf("Component %d:" ++numCC), dfs(i), printf("\n");
+ */
 void dfs(int node) {
-   visited.fill(false);
-   dfs_visit(node);
+   dfs_num[node] = DFS_BLACK;
+   fori(j, adj_list.size()) {
+      ii v = adj_list[node][j];
+      if(dfs_num[v.first] == DFS_WHITE)
+         dfs(v.first);
+   }
 }
 
-/* Acha o numero de nos conectados */
-void find_con_nodes() {
-   visited.fill(false);
-   fori(i, V)
-      if (!visited[i])
-         printf("CC %d:", ++numCC), dfs(i), printf("\n");
-}
-
-int dr[] = {1, 1, 0, -1, -1, -1, 0, 1};
-int dc[] = {0, 1, 1, 1, 0, -1, -1, -1};
-/* rows, cols, replace c1 with c2;
- * retorna o numero de c1s */
-int floodfill(int r, int c, char c1, char c2) {
-   if (r < 0 || r >= R || c < 0 || c >= C) return 0;
-   if (grid[r][c] != c1) return 0;
-   int ans = 1;
-   grid[r][c] = c2;
-   fori(d, 8)
-      ans += floodfill(r+dr[d], c+dc[d], c1, c2);
-   return ans;
-}
-
-vi ts; // Guarda topsort na ordem reversa
-void top_sort(int u) {
-   visited[u] = true;
+/* Colorir as aretas do grafo, dfs_num vai ter as cores */
+/* numCC = 0;
+ * dfs_num.assign(V, DFS_WHITE);
+ * fori(i, v)
+ *    if(dfs_num[i] == DFS_WHITE)
+ *       flood_fill(i, ++numCC);
+ */
+void flood_fill(int u, int color) {
+   dfs_num[u] = color;
    fori(j, adj_list.size()) {
       ii v = adj_list[u][j];
-      if(!visited[v.first])
+      if(dfs_num[v.first] == DFS_WHITE)
+         flood_fill(v.first, color);
+   }
+}
+
+vi topoSort;
+/* topoSort.clear()
+ * dfs_num.assign(V, WHITE)
+ * fori(i, V)
+ *    if (dfs_num == WHITE)
+ *       top_sort(i)
+ * reverse(topoSort.begin(), topoSort.end());
+ */
+void top_sort(int u) {
+   dfs_num[u] = DFS_BLACK;
+   fori(j, adj_list.size()) {
+      ii v = adj_list[u][j];
+      if(dfs_num[v.first] == DFS_WHITE)
          top_sort(v.first);
    }
-   ts.push_back(u);
+   topoSort.push_back(u);
 }
 
-bool Bipartite() {
-   queue<int> q; q.push(s);
-   vi color(V, INF);
-   color[s] = 0;
-   bool isBi = true;
-   while(!q.empty() & is Bi) {
-      int u = q.front(); q.pop();
+/* Organizar as arestas de um grafo em: forward, back, bidirecional */
+#define DFS_GRAY 2
+vi dfs_parent;
+/* numCC = 0
+ * dfs_num.assign(V, WHITE), dfs_parent.assign(V, -1)
+ * fori(i, V)
+ *    if(dfs_num == WHITE)
+ *       printf("Component %d:\n", ++numCC), graph_check(i);
+ */
+void graph_check(int u) {
+   dfs_num[u] = DFS_GRAY;
+   fori(j, adj_list.size()){
+      ii v = AdjList[u][j];
+      if (dfs_num[v.first] == DFS_WHITE) {
+         dfs_parent[v.first] = u;
+         graph_check(v.first);
+      }
+      else if (dfs_num[v.first] == DFS_GRAY) {
+         if (v.first == dfs_parent[u]
+               printf(" Bidirectional (%d, %d) - (%d, %d)\n", u, v.first, v.first, u);
+               else
+               printf(" Back Edge (%d, %d) (Cycle)\n", u, v.first);
+               }
+               else if (dfs_num[v.first] == DFS_BLACK)
+               printf(" Forward/Cross Edge (%d, %d)\n", u, v.first);
+               }
+               dfs_num[u] = DFS_BLACK;
+               }
+
+               /* Checar se um grafo pode ser colorido de 2 cores diferentes */
+               void bipartite_check(int s) {
+               queue<int> q;
+               q.push(s);
+               vi color(V, INF);
+               color[s] = 0;
+               bool isB = true;
+               while(!q.empty() && isB) {
+               int u = q.front(); q.pop();
+               fori(j, adj_list.size()) {
+                  ii v = adj_list[u][j];
+                  if(color[v.first] == INF) {
+                     color[v.first] = 1-color[u];
+                     q.push(v.first);
+                  } else if (color[v.first] == color[u]) {
+                     isB = false;
+                     break;
+                  }
+               }
+               }
+               }
+
+vi dfs_low;
+vi arti_vtx;
+int dfsNCont = 0,dfsRoot, rootChild;
+/* dfs_low.assign(V, 0);
+ * dfs_parent.assign(V, -1), arti_vtx.assign(V, 0)
+ * fori(i, V)
+ *    if(dfs_num == WHITE)
+ *       dfsRoot = i; rootChild = 0;
+ *       articulation(i);
+ *       arti_vtx[dfsRoot] = (rootChild >1);
+ */
+void articulation(int u) {
+   dfs_low[u] = dfs_num[u] = dfsNCont++;
+   fori(j, adj_list.size()) {
+      ii v = adj_list[u][j];
+      if(dfs_num[v.first] == DFS_WHITE) {
+         dfs_parent[v.first] = u;
+         if(u == dfsRoot) rootChild++;
+         articulation(v.first);
+         if (dfs_low[v.first] >= dfs_num[u])
+            arti_vtx[u] = true;
+         if (dfs_low[v.first] > dfs_num[u])
+            printf(" Edge [%d,%d] is a bridge\n", u, v.first);
+         dfs_low[u] = min(dfs_low[u], dfs_low[v.first]);
+      } else if(v.first != dfs_parent[u])
+         dfs_low[u] = min(dfs_low[u], dfs_num[v.first])
+   }
+}
+
+void strongly_connected(int u) {
+}
+
+/* Kruskal and Prim */
+vi taken;
+priority_queue<ii> pq;
+void process(int vtx) {
+   taken[vtx] = 1;
+   fori(j, adj_list.size()) {
+      ii v = adj_list[vtx][j];
+      if (!taken[v.first])
+         pq.push(ii(-v.second, -v.first));
+   }
+}
+
+void MST() {
+   //edge_list.push_back(make_pair(w, ii(u, v)));
+   sort(edge_list.begin(), edge_list.end());
+   int mst_cost = 0;
+   UnionFind UF(v);
+   fori(i, E) {
+      pair<int, ii> front = edge_list[i];
+      if (!UF.isSameSet(front.second.first, front.second.second)) {
+         mst_cost += front.first;
+         UF.unionSet(front.second.first, front.second.second);
+      }
+   }
+}
+
+/* Dijkstra: SSSP em grafo com pesos positivos */
+void dijkstra(int s) {
+   vi dist(V, INF); dist[s] = 0;
+   priority_queue<ii, vector<ii>, greater<ii> > pq;
+   pq.push(ii(0, s));
+   while(!pq.empty()) {
+      ii front = pq.top(); pq.pop();
+      int d = front.first, u = front.second;
+      if(d > dist[u]) continue;
       fori(i, adj_list[u].size()) {
-         ii v = adj_list[u][i];
-         if(color[v.first] == INF) {
-            color[v.first] = 1- color[u];
-            q.push(v.first);
-         }else if (color[v.first] == color[u]) {
-            isBi = false;
-            break;
+         ii v = adj_list[u][j];
+         if(dist[u]+v.second < dist[v.first]) {
+            dist[v.first] = dist[u] + v.second;
+            pq.push(ii(dist[v.first], v.first));
          }
       }
    }
-   return isBi;
-}
-
-void articulationPointAndBridge(int u) {
-}
-
-void dijkstra(int node, vi *cost) {
-   visited.fill(false);
-   cost->at(node) = 0;
-   priority_queue<ii, vector<ii>, greater<ii> > q;
-   q.push(make_pair(0, node));
-
-   while(!q.empty()) {
-      ii p = q.top();
-      q.pop();
-      int u = p.second;
-      if (visited[u]) continue;
-
-      visited[u] = 1;
-      foreach(it, adj_list[u]) {
-         int v = it->first;
-         int weight = it->second;
-         if(cost->at(u) + weight < cost->at(v)) {
-            cost->at(v) = cost->at(u) + weight;
-            q.push(make_pair(cost->at(v), v));
-         }
-      }
+   fori(i, V) {
+      printf("SSSP(%d, %d) = %d\n", s, i dist[i]);
    }
 }
 
 
+/* Bellman Ford: SSSP em grafo com pesos negativos */
+void bellmanFord(int s) {
+   vi dist(V, INF);
+   dist[s] = 0;
+   for (int i = 0; i < V - 1; i++)
+      for (int u = 0; u < V; u++)
+         for (int j = 0; j < (int)AdjList[u].size(); j++) {
+            ii v = AdjList[u][j];
+            dist[v.first] = min(dist[v.first], dist[u] + v.second);
+         }
 
-void prim(Graph *result) {
+   bool hasNegativeCycle = false;
+   fori(u, V) {
+      fori(j, adj_list.size()) {
+         ii v = adj_list[u][j];
+         if(dist[v.first] > dist[u] + v.second)
+            hasNegativeCycle = true;
+      }
+   }
 }
 
-void kruskal(Graph *result) {
+/* Floyd-Warshall: All pairs shortest path */
+
+void fW() {
+   fori(k, V) {
+      fori(i, V) {
+         fori(j, V) {
+            adj_mat[i][j] = min(adj_mat[i][j], adj_mat[i][k]+adj_mat[k][j]);
+         }
+      }
+   }
+   fori(i, V) {
+      fori(j, V) {
+         printf("APSP(%d, %d) = %d\n", i, j, adj_mat[i][j]);
+   /*
+for (int i = 0; i < V; i++)
+   for (int j = 0; j < V; j++)
+      p[i][j] = i;
+for (int k = 0; k < V; k++)
+   for (int i = 0; i < V; i++)
+      for (int j = 0; j < V; j++)
+         if (AdjMat[i][k] + AdjMat[k][j] < AdjMat[i][j]) {
+            AdjMat[i][j] = AdjMat[i][k] + AdjMat[k][j];
+            p[i][j] = p[k][j];
+         }
+*/
 }
+
+/* Network Flow: Edmond Karp */
+
 
 /*---------- Union Find Disjoint Set ----------*/
-int root(vi* arr, int i) {
-   while(arr->at(i) != i) {
-      arr->at(i) = arr->at(arr->at(i));
-      i = arr->at(i);
-   }
-   return i;
-}
 
-bool find(vi* arr, int a, int b) {
-   return (root(arr, a) == root(arr, b));
-}
-
-void weighted_union(vi* arr, vi* size, int a, int b) {
-   int rA = root(arr, a);
-   int rB = root(arr, b);
-#ifdef _DEBUG_
-   printf("Adding %d to %d\n", a, b);
-   printf("   Root of %d: %d\n", a, rA);
-   printf("   Root of %d: %d\n", b, rB);
-   printf("   Size of %d: %d\n", a, size->at(a));
-   printf("   Size of %d: %d\n", b, size->at(b));
-#endif
-
-   if (size->at(a) < size->at(b)) {
-#ifdef _DEBUG_
-      printf("   %d < %d\n", a, b);
-      printf("   Adding %d to %d\n", a, b);
-#endif
-      arr->at(rA) = rB;
-      size->at(rB) += size->at(rA);
-   } else {
-#ifdef _DEBUG_
-      printf("   %d > %d\n", a, b);
-      printf("   Adding %d to %d\n", b, a);
-#endif
-      arr->at(rB) = rA;
-      size->at(rA) += size->at(rB);
-   }
+class UnionFind {
+   private:
+      vi p, rank, setSize;
+      int numSets;
+   public:
+      UnionFind(int N) {
+         setSize.assign(N, 1);
+         rank.assign(N, 0);
+         p.assign(N, 0);
+         fori(i, N)
+            p[i] = i;
+         numSets = N;
+      }
+      int findSet(int i) { 
+         return (p[i] == i) ? i : (p[i] = findSet(p[i])); 
+      }
+      bool isSameSet(int i, int j) {
+         return findSet(i) == findSet(j);
+      }
+      void unionSet(int i, int j) {
+         if(!isSameSet(i, j)) {
+            numSets--;
+            int x = findSet(i), y = findSet(j);
+            if(rank[x] > rank[y]) {
+               p[y] = x;
+               setSize[x] += setSize[y];
+            } else {
+               p[x] = y;
+               setSize[y] += setSize[x];
+               if(rank[x] == rank[y])
+                  rank[y]++;
+            }
+         }
+      }
+      int numDisjointSets(){ return numSets; }
+      int sizeOfSet(int i) { reuturn setSize[findSet(i)]; }
 }
 
 /*---------- Segment Tree ----------*/
@@ -205,79 +319,133 @@ void weighted_union(vi* arr, vi* size, int a, int b) {
  * Ex: Achar o index do menor elemento na range[i,j]
  */
 
-/*
- * p = 
- * L = 
- * R = 
- * I = 
- * J = 
- */
-int aux_rmq(vi* arr, vi* seg, int p, int L, int R, int i, int j) {
-#ifdef _DEBUG_
-   printf("   Looking between %d and %d\n", L, R);
-#endif
-   if (i > R || j < L) return -1;
-   if (L == R) return seg->at(p);
+class SegmentTree{
+   private:
+      vi st, A;
+      int n;
+      int left(int p) { return p << 1; }
+      int right(int p) { return (p << 1) -1; }
+      void build(int p, int L, int R) {
+         if(L == R)
+            st[p] = L;
+         else {
+            build(left(p), L, (L+R)/2);
+            build(right(p), ((L+R)/2)+1, R);
+            int p1 = st[left(p)], p2 = st[right(p)];
+            st[p] = (A[p1] <= A[p2]) ? p1 : p2;
+         }
+      }
+      int rmq(int p, int L, int R, int i, int j) {
+         if(i > R || j < L) return -1;
+         if(L >= i && R <= j) return st[p];
 
-   int left = p << 1;
-   int right = (p << 1)+1;
-#ifdef _DEBUG_
-   printf("   Left: %d Right: %d\n", left, right);
-#endif
-   int n1 = aux_rmq(arr, seg, left,  L, (L+R)/2, i, j);
-   int n2 = aux_rmq(arr, seg, right, (L+R)/2+1, R, i, j);
-#ifdef _DEBUG_
-   printf("N1: %d  N2: %d\n", n1, n2);
-#endif
-   if (n1 == -1) return n2;
-   if (n2 == -1) return n1;
-   return (arr->at(n1) <= arr->at(n2) ? n1 : n2);
-}
+         int p1 = rmq(left(p), L, (L+R)/2, i, j);
+         int p2 = rmq(right(p), (L+R)/2+1, R, i, j);
 
-int aux_update(vi* arr, vi* tree, int p, int L, int R, int idx, int new_v) {
-   int i = idx, j = idx;
-   if (i > R || j < L)
-      return tree->at(p);
-   if (L == i && R == j) {
-      arr->at(i) = new_v;
-      return tree->at(p) = L;
-   }
-}
+         if(p1 == -1) return p2;
+         if(p2 == -1) return p1;
+         return (A[p1] <= A[p2]) ? p1 : p2;
+      }
+      int update_point(int p, int L, int R, int idx, int new_value) {
+         int i = idx, int j = idx;
+         if (i > R || j < L) return st[p];
+         if (L == i && R == j) {
+            A[i] = new_value;
+            return st[p] = L;
+         }
+         int p1, p2;
+         p1 = update_point(left(p), L, (L+R)/2, idx, new_value);
+         p2 = update_point(right(p), (L+R)/2+1, R, idx, new_value);
+         return st[p] = (A[p1] <= A[p2]) ? p1 : p2;
+      }
 
-int update_value(vi* arr, vi* tree, int idx, int new_v) {
-   return aux_update(arr, tree, 1, 0, arr->size()-1, idx, new_v);
-}
+   public:
+      SegmentTree(const vi &_A) {
+         A = _A;
+         n = (int) A.size();
+         st.assign(4*n, 0);
+         build(1, 0, n-1);
+      }
+      int rmq(int i, j) { return rmq(1, 0, n-1, i, j);}
+      int update_point(int idx, int new_value) {
+         return update_point(1, 0, n-1, idx, new_value);
+      }
+};
 
-int rmq(vi* arr, vi* seg, int L, int R) {
-#ifdef _DEBUG_
-   printf("Looking between %d and %d\n", L, R);
-#endif
-   return aux_rmq(arr, seg, 1, 0, arr->size()-1, L, R);
-}
-
-void segTree(vi* arr, vi* tree, int n, int L, int R) {
-   int left = n << 1;
-   int right = (n << 1)+1;
-#ifdef _DEBUG_
-   printf("Segment of %d: %d / %d\n", n, L, R);
-   printf("   Left: %d, Right: %d\n", left, right);
-#endif
-   if (L == R) {
-      tree->at(n) = L;
-   } else {
-      segTree(arr, tree, left, L, (L+R)/2);
-      segTree(arr, tree, right, (L+R)/2+1, R);
-      int n1 = tree->at(left), n2 = tree->at(right);
-      tree->at(n) = (arr->at(n1) <= arr->at(n2)) ? n1 : n2;
-   }
-}
 
 
 /*---------- Fenwick Tree ----------*/
-/* AKA Binary Indexed Tree - Dynamic Cumulative Frequency Table */
-void fenwick() {
+/* AKA Binary Indexed Tree - Dynamic Cumulative Frequency Table 
+ * Tambem pode ser usada pra resolver problemas de Range Sum Query
+ */ 
+class FenwickTree {
+   private:
+      vi ft;
+
+   public:
+      FenwickTree(){}
+      FenwickTree(int n) { ft.assign(n+1, 0); }
+      int rsq(int b) {
+         int sum = 0;
+         for(; b; b -= LSOne(b)) sum += ft[b];
+         return sum;
+      }
+      int rsq(int a, int b) {
+         return rsq(b) - (a == 1 ? 0 : rsq(a-1));
+      }
+      void adjust(int k, int v) {
+         for(; k < (int)ft.size(); k += LSOne(k))
+            ft[k] += v;
+      }
+};
+
+/*----------- Max 1D Range Sum ----------*/
+int range_sum(vi *a) {
+   int run_sum = 0, ans = 0;
+   fori(i, a->size()) {
+      if(run_sum + a->at(i) >= 0) {
+         run_sum += a->at(i);
+         ans = max(ans, run_sum);
+      } else
+         run_sum = 0;
+   }
+   return anx;
 }
 
+/*---------- Longest Increasing Sequence ----------*/
+void reconstruct_print(int end, vi *a, vi *p) {
+   int x = end;
+   stack<int> s;
+   for(; p[x] >= 0; x = p[x]) s.push(a[x]);
+   printf("[%d", a[x]);
+   for(; !s.empty(); s.pop()) printf(", %d", s.top());
+   printf("]\n");
+}
+
+int lis(vi *a) {
+   int L[MAX_N], L_id[MAX_N], P[MAX_N];
+   int lis = 0, lis_end = 0;
+   fori(i, a->size()) {
+      int pos = lower_bound(L, L+lis, a->at(i)) - L;
+      L[pos] = A[i];
+      L_id[pos] = i;
+      P[i] = pos ? L_id[pos-1] : -1;
+      if(pos+1 > lis) {
+         lis = pos+1;
+         lis_end = 1;
+      }
+      printf("Considering element A[%d] = %d\n", i, A[i]);
+      printf("LIS ending at A[%d] is of length %d: ", i, pos + 1);
+      reconstruct_print(i, A, P);
+      print_array("L is now", L, lis);
+      printf("\n");
+   }
+
+   printf("Final LIS is of length %d: ", lis);
+   reconstruct_print(lis_end, A, P);
+   return 0;
+
+}
 
 int main() {
    int aux[] = {18, 17, 13, 19, 15, 11, 20};
