@@ -10,10 +10,32 @@ using namespace std;
 #define foreach(i, c) for( __typeof( (c).begin() ) i = (c).begin(); i != (c).end(); ++i )
 #define all(x) (x).begin,(x).end
 #define fori(i, n) for(int i = 0; i < (n); i++)
+#define INF 1000000000
 
+typedef long long     ll
 typedef pair<int,int> ii;
+typedef pair<int,ii>  iii
 typedef vector<int> vi;
 typedef vector<ii> vii;
+
+//memset(arr, 0, sizeof arr); // Clear array
+
+// Imprimir N casas de Pi
+double pi = 2 * acos(0,0);
+cin << n << pi;
+printf("%. *lf\n", n, pi);
+
+// Imprimir numeros distintos ordenados
+sort(ALL(v)); UNIQUE(v);
+
+// Gen todos os subsets
+int p[20], N = 2
+for(i = 0; i < 20; i++) p[i] = i
+for(i = 0; i < (i << N); i++)
+   for(j = 0; j < N; j++)
+      if (i & (i << j))
+         printf("%d ", p[j])
+   printf("\n")
 
 /*---------- GRAPH ---------- */
 
@@ -245,8 +267,7 @@ void bellmanFord(int s) {
 }
 
 /* Floyd-Warshall: All pairs shortest path */
-
-void fW() {
+void floydWarshall() {
    fori(k, V) {
       fori(i, V) {
          fori(j, V) {
@@ -257,7 +278,7 @@ void fW() {
    fori(i, V) {
       fori(j, V) {
          printf("APSP(%d, %d) = %d\n", i, j, adj_mat[i][j]);
-   /*
+/* Imprimir o caminho
 for (int i = 0; i < V; i++)
    for (int j = 0; j < V; j++)
       p[i][j] = i;
@@ -271,8 +292,47 @@ for (int k = 0; k < V; k++)
 */
 }
 
-/* Network Flow: Edmond Karp */
+void transitiveClosure() {
+   fori(k, V)
+      fori(i, V)
+         fori(j, V)
+            adjMat[i][j] |= (adjMat[i][k] & adjMat[k][j])
+}
 
+/* Network Flow: Edmond Karp */
+int res[V][V], mf, f, s, t;
+vi p;
+void aug(int v, int minEdge) {
+   if(v == s) {
+      f = minEdge;
+      return;
+   } else if(p[v] != -1) {
+      aug(p[v] -= f);
+      res[v][p[v]] += f
+   }
+}
+void karp() {
+   mf = 0;
+   while(true) {
+      f = 0;
+      vi dist(V, INF);
+      dist[s] = 0;
+      queue<int> q;
+      q.push(s);
+      p.assign(V, -1);
+      while(!q.empty()) {
+         int u = q.front(); q.pop();
+         if(u == t) break;
+         fori(v, V)
+            if(res[u][v] > 0 && dist[v] == INF)
+               dist[v] = dist[u]+1, q.push(v), p[v] = u;
+      }
+      aug(t, INF);
+      if(f == 0) break;
+      mf += f;
+   }
+   printf("%d\n", mf);
+}
 
 /*---------- Union Find Disjoint Set ----------*/
 
@@ -372,8 +432,6 @@ class SegmentTree{
       }
 };
 
-
-
 /*---------- Fenwick Tree ----------*/
 /* AKA Binary Indexed Tree - Dynamic Cumulative Frequency Table 
  * Tambem pode ser usada pra resolver problemas de Range Sum Query
@@ -445,6 +503,63 @@ int lis(vi *a) {
    reconstruct_print(lis_end, A, P);
    return 0;
 
+}
+
+/*========== Math ==========*/
+class Main{
+   public static void main(String[] args) {
+      Scanner sc = new Scanner(System.in);
+      int caseNo = 1;
+      while(1) {
+         int N = sc.nextInt(), F = sc.nextInt();
+         if(N == 0 && F == 0) break;
+         for(int i = 0; i < N; i) {
+            BigInteger V = sc.nextBigInteger();
+            sum = sum.add(V);
+         }
+      }
+
+      // Ler um inteiro e converter pra base b;
+      BigInteger p = new BigInteger(sc.next(), b);
+
+      // Greatest Commmon Divisor
+      BigInterger p, q;
+      BigInteger gcd = p.gcd(q);
+      sout(p.divise(gcd) + "/" + q.divide(gcd));
+
+      // Modulos
+      // x elevado a y mod n
+      sout(x.modPow(y, n));
+   }
+}
+
+/* Binomial Coefficient
+ * C(n, 0) = C(n,n) = 1
+ * C(n, k) = C(n-1, k-1)+C(n-1, k)
+ */
+
+/* Catalan Numbers
+ * Cat(n) = (2n!)/(n!n!(n+1))
+ * Cat(n+1) = [(2n+2)(2n+1)]/[(n+2)(n+1)] * cat(n)
+ */
+
+// Sieve of Eratosthenes
+void sieve(ll upperbound) {
+   _sieve_size = upperbound+1;
+   bs.set();
+   bs[0] = bs[1] = 0;
+   for(ll i = 2; i <= _sieve_size; i++)
+      if(bs[i]) {
+         for(ll j = i*i; j <= _sieve_size; j+= i)
+            bs[j] = 0;
+         primes.push_back((int)i);
+      }
+}
+bool isPrime(ll N) {
+   if(N <= _sieve_size) return bs[N];
+   fori(i, primes.size())
+      if(N % primes[i] == 0) return false;
+   return true;
 }
 
 int main() {

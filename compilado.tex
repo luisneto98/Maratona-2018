@@ -15,8 +15,6 @@
 Os mais usados são \textbf{vector}, \textbf{pair}, \textbf{map}, \textbf{set}.
 
 \subsection{Vector}
-Refinamento das classes Random Access Sequence e Back Insertion Sequence, se
-comporta como um array.\\
 Definido em \textbf{<vector>}.\\
 
 Funções definidas:
@@ -24,18 +22,55 @@ Funções definidas:
    \item empty, size, clear push\_back, pop\_back, insert, erase, begin, end
 \end{itemize}
 
+\subsection{Balanced Search Tree (Map/Set)}
+Tabela de símbolos genérica, com chave e valor.\\
+Definido em \textbf{<map>} e \textbf{<set>}. \\
+A diferença é que map tem chave e valor, e set tem só valor.
+
+Funções definidas:
+
+\begin{itemize}
+   \item clear, insert, insert\_or\_assign, emplace, emplace\_hint, try\_emplace, erase, swap, extract, merge
+   \item count, find, contains, equal\_range, lower\_bound, upper\_bound
+   \item key\_comp, value\_comp
+\end{itemize}
+
 \begin{lstlisting}
-vector<int>::iterator cur = vet.begin() \\Usando iterator
-vector<int>::iterator end = vet.end() \\Usando iterator
-while (; cur != end, ++cur)
-   cout << *cur << endl;
+// Construtores
+map<string, vector<int> > mapa;
+set<string> conjunto;
+
+const map<std::string, int> init {
+ {"this", 100},
+};
+
+bool cmp()(int lhs, int rhs) const {
+   return lhs > rhs;
+}
+map<int, int, cmp> mapa_compare;
 \end{lstlisting}
 
 \subsection{Bitset}
+Definido em \textbf{bitset}
+
+\begin{itemize}
+   \item test, all, any, none, count
+   \item set, reset, flip
+   \item to\_string, to\_ulong, to\_ullong
+   \item \&= |= \^= ~= -> and, or, xor, not
+   \item <<, >> shift left and right
+\end{itemize}
 
 \subsection{Linked List}
+Dois tipos de lista: list e forward\_list.
+
+\begin{itemize}
+   \item clear, insert, emplace, erase, push\_back, emplace\_back, pop\_back, push\_front, emplace\_front, pop\_front, resize, swap, (emplace\_after, erase\_after
+   \item merge, splice, remove, remove\_if, reverse, unique, sort
+\end{itemize}
 
 \subsection{Stack}
+
 
 \subsection{Queue and Double Queue}
 
@@ -43,27 +78,10 @@ while (; cur != end, ++cur)
 Pair é uma struct, e não uma classe.\\
 Pra fazer um pair:
 \begin{lstlisting}
-make_pair(first, second)
+#typedef pair<int,int> p;
+p.make_pair(first, second);
 \end{lstlisting}
 
-\subsection{Balanced Search Tree (Map/Set)}
-Tabela de símbolos genérica, com chave e valor.\\
-Definido em \textbf{<map>}.\\
-É possível iterar sobre o mapa, usando begin() e end().
-
-Funções definidas:
-
-\begin{itemize}
-   \item insert(pair<key, value>):pair<iterator, bool>, find(key):iterator, begin():iterator, end():iterator
-\end{itemize}
-
-\begin{lstlisting}
-map<string, vector<int> > teste;
-vector<int> numeros(10, 0);
-
-pair<map<string, vector<int> >::iterator, bool> resultado ;
-resultado = ex.insert(make_pair("lucas", numeros));
-\end{lstlisting}
 
 \subsection{Heap (priority\_queue)}
 
@@ -83,55 +101,17 @@ resultado = ex.insert(make_pair("lucas", numeros));
    \item stable\_sort(first, last [,comp]):
    \item merge(first1, last1, first2, last2, result [,comp]):
    \item inplace\_merge():
-   \item includes():
-   \item set\_union():
-   \item is\_sorted():
-   \item min(), max():
-   \item iota():
-   \item binary\_search();
-   \item next\_permutation();
-      \begin{lstlisting}
-      \end{lstlisting}
-   \item min\_element():
-   \item max\_element():
+   \item includes(first1, last1, first2, last [,compare]):
+   \item is\_sorted(first, last [,compare]):
+   \item min(a, b), max(a, b):
+   \item iota(first, last, value):
+   \item binary\_search(first, last, value [,compare]);
+   \item next\_permutation(first, last [,compare]);
+   \item min\_element(first, last):
+   \item max\_element(first, lat):
 \end{itemize}
 
 \section{Misc}
-
-\begin{lstlisting}
-#define _foreach(it, b, e) for (typeof(b) it = (b); it != (e); it++) 
-#define foreach(x...) _foreach(x)
-#define all(x) (x).begin(), (x).end()
-#define UNIQUE(c) c.resize(unique(all(c)) - (c).begin())
-
-#define INF 1000000000
-
-typedef long long     ll
-typedef pair<int,int> ii
-typedef pair<int,ii>  iii
-typedef vector<int>   vi
-typedef vector<ii>    vii
-
-//memset(arr, 0, sizeof arr); // Clear array
-
-// Imprimir N casas de Pi
-double pi = 2 * acos(0,0);
-cin << n << pi;
-printf("%. *lf\n", n, pi);
-
-// Imprimir numeros distintos ordenados
-sort(ALL(v)); UNIQUE(v);
-
-// Gen todos os subsets
-int p[20], N = 2
-for(i = 0; i < 20; i++) p[i] = i
-for(i = 0; i < (i << N); i++)
-   for(j = 0; j < N; j++)
-      if (i & (i << j))
-         printf("%d ", p[j])
-   printf("\n")
-
-
-\end{lstlisting}
+\lstinputlisting[language=c++]{structs.cpp}
 
 \end{document}
