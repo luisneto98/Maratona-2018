@@ -12,6 +12,9 @@ using namespace std;
 
 //#define __DEBUG__
 
+#define ABS(a, b) (a) > (b) ? (a) - (b) : (b) - (a)
+#define MAXSIZE 100000
+
 typedef pair<long long int, long long int> ll;
 typedef vector<ll> vll;
 
@@ -24,88 +27,60 @@ bool cmp(const ll &a, const ll &b)
   return (a.first < b.first);
 } 
 
-int bin_search(vll &v, long long val, long long line_id, int c_pos=-1){
-  int middle;
-  int left = 0;
-  int right = v.size() - 1;
-
-  if(c_pos != -1){
-	if(v[c_pos].first == val) return c_pos;
-  }
-  
-  while(left <= right){
-	middle = (left + right) / 2;
-	
-	if(v[middle].first == val){
-	  int aux = middle;
-	  while(aux >= 0 && v[aux].first == val){
-		aux--;
-	  }
-
-	  return aux + 1;
-	}
-
-	if(v[middle].first > val) right = middle-1;
-	else left = middle + 1;
-	
-  }
-
-  return -1;
-}
-
 int main(){
   long long X, Y;
   long long cut_s, cut_f;
   int H, V;
-  vll H_ID, V_ID;
   vll H_U, H_D, V_L, V_R;
+  int map_pos_V[MAXSIZE], map_pos_H[MAXSIZE];
   int count = 1;
   
   scanf("%Ld %Ld", &X, &Y);
-  
   scanf("%d %d", &H, &V);
 
   count += H * V;
   
   fori(i, H){
 	scanf("%Ld %Ld", &cut_s, &cut_f);
-
-	H_ID.push_back(make_pair(cut_s, cut_f));
 	H_U.push_back(make_pair(cut_s, (long long) i));
 	H_D.push_back(make_pair(cut_f, (long long) i));
-
-	sort(H_U.begin(), H_U.end(), cmp);  
-	sort(H_D.begin(), H_D.end(), cmp);
-
-	int p_u = bin_search(H_U, cut_s, i);
-	int p_d = bin_search(H_D, cut_f, i, p_u);
-
-	count += abs(p_u - p_d) + 1;
-
-#ifdef __DEBUG__
-	printf("Reta Horizontal [%d]:\n Intersecções: %d + %d\n", i, abs(p_u - p_d), V);
-#endif
   }
+
+  sort(H_U.begin(), H_U.end(), cmp);  
+  sort(H_D.begin(), H_D.end(), cmp);
 
   fori(i, V){
 	scanf("%Ld %Ld", &cut_s, &cut_f);
-
-	V_ID.push_back(make_pair(cut_s, cut_f));
 	V_L.push_back(make_pair(cut_s, (long long) i));
 	V_R.push_back(make_pair(cut_f, (long long) i));
-
-	sort(V_L.begin(), V_L.end(), cmp);  
-	sort(V_R.begin(), V_R.end(), cmp);
-
-	int p_l = bin_search(V_L, cut_s, i);
-	int p_r = bin_search(V_R, cut_f, i);
-
-	count += abs(p_l - p_r) + 1;
-
-#ifdef __DEBUG__
-	printf("Reta Vertical [%d]:\n Intersecções: %d + %d\n", i, abs(p_l - p_r), H);
-#endif
   }
+
+  sort(V_L.begin(), V_L.end(), cmp);  
+  sort(V_R.begin(), V_R.end(), cmp);
+
+  fori(i, H_D.size()) map_pos_H[H_D[i].second] = i;
+  
+  fori(i, V_R.size()) map_pos_V[V_R[i].second] = i;
+
+  int intersecs = 0;
+
+  fori(i, H_U.size()){
+	intersecs += ABS(i, map_pos_H[H_U[i].second]);
+	count++;
+  }
+
+  intersecs = intersecs/2;
+  count += intersecs;
+
+
+  intersecs = 0;
+  fori(i, V_L.size()){
+	intersecs += ABS(i, map_pos_V[V_L[i].second]);
+	count++;
+  }
+
+  intersecs = intersecs/2;
+  count += intersecs;
   
   printf("%d\n", count);
 
